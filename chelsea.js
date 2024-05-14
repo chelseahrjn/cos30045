@@ -1,7 +1,9 @@
 function init() {
     var w = 600;
     var h = 400;
+    var padding = 50;
 
+    // Hard coded
     const dataset = [
         {
             Australia: {
@@ -27,7 +29,18 @@ function init() {
             Chile: {
                 pharma: 61.1, deaths: 3684
             }
+        },
+        {
+            Colombia: {
+                pharma: 48, deaths: 6859
+            }
+        },
+        {
+            "Costa Rica": {
+                pharma: 0, deaths: 769
+            }
         }
+        // ...
     ];
 
     scatterChelsea(dataset, "#chelseaChart")
@@ -48,22 +61,22 @@ function init() {
         const deathsData = countryData.map(country => country.deaths);
 
         const xScale = d3.scaleLinear()
-            .domain([d3.min(pharmaData), d3.max(pharmaData)])
-            .range([50, w - 50]);
+            .domain([0, d3.max(pharmaData)])
+            .range([padding, w - padding]);
 
         const yScale = d3.scaleLinear()
-            .domain([d3.min(deathsData), d3.max(deathsData)])
-            .range([h - 50, 50]);
+            .domain([0, d3.max(deathsData)])
+            .range([h - padding, padding]);
 
         const xAxis = d3.axisBottom(xScale);
         const yAxis = d3.axisLeft(yScale);
 
         svg.append("g")
-            .attr("transform", `translate(0, ${h - 50})`)
+            .attr("transform", `translate(0, ${h - padding})`)
             .call(xAxis);
 
         svg.append("g")
-            .attr("transform", "translate(50, 0)")
+            .attr("transform", `translate(${padding}, 0)`)
             .call(yAxis);
 
         svg.selectAll("circle")
@@ -73,9 +86,10 @@ function init() {
             .attr("cx", d => xScale(d.pharma))
             .attr("cy", d => yScale(d.deaths))
             .attr("r", 5)
-            .attr("fill", "steelblue");
+            .attr("fill", "steelblue")
+            .append("title")
+            .text((d, i) => country[i]);
     }
-
 
 }
 
