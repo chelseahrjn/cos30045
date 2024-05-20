@@ -9,3 +9,34 @@
     margin: auto;
     text-align: center;
 }
+
+.footer {
+    width: 60%;
+    margin: 30px auto;
+    text-align: center;
+}
+
+.footer .left {
+    text-align: right;
+}
+
+.footer .right {
+    text-align: left;
+}
+
+.footer p {
+    margin-bottom: 0;
+}
+
+/* Chelsea */
+.container {
+    margin-top: 30px;
+}
+
+select .form-select {
+    width: 30%;
+}
+
+.x-axis-label, .y-axis-label {
+    font-size: 11px;
+}
