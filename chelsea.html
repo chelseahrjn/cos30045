@@ -21,19 +21,42 @@
 <body>
 
 	<div class="title">
-		<h1>Title of Chelsea's Visualisation</h1>
-		<h2>Sub Heading</h2>
+		<h3>Correlation between Annual Consumption of Drugs Used in Diabetes and Deaths by Diabetes Mellitus in OECD Countries</h3>
 	</div>
 
-	<div>
-        <p>Data retrieved from <a href="https://www.oecd-ilibrary.org/social-issues-migration-health/data/oecd-health-statistics_health-data-en">OECD Health Statistics</a></p>
-		<p id="chelseaChart"></p>
+	<div class="container">
+		<div class="row">
+			<div class="col-9">
+				<p>Data retrieved from <a class="btn btn-sm btn-outline-dark" href="https://www.oecd-ilibrary.org/social-issues-migration-health/data/oecd-health-statistics_health-data-en">OECD Health Statistics</a></p>
+			</div>
+			<div class="col-3">
+				<select class="form-select form-select-sm" aria-label="Select year" id="yearSelector">
+					<!-- will be added dynamically -->
+				</select>
+			</div>
+		</div>
+		<div class="chart">
+			<p id="chelseaChart"></p>
+		</div>
+	
+		<a href="index.html" class="btn btn-sm btn-outline-dark"><< Back to Home</a>
+		<br>
+	
+	
+		<div class="footer">
+			<div class="row">
+				<div class="col-6 left">
+					<p>Chelsea Harijono 104686161</p>
+					<p>Moonstone Acharya 104196521</p>
+				</div>
+				<div class="col-6 right">
+					<p>CL10 - T05</p>
+					<p>COS30045 Data Visualisation</p>
+				</div>
+			</div>
+		</div>
+				
 	</div>
-
-    <a href="index.html" class="back">Back to Home</a>
-
-
-    <div class="footer">CL10 - T05<br>Chelsea<br>Moonstone<br><br>COS30045 Data Visualisation</div>
 
     <!-- Bootstrap JS -->
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

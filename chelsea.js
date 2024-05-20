@@ -3,73 +3,104 @@ function init() {
     var h = 400;
     var padding = 50;
 
-    // Hard coded
-    const dataset = [
-        {
-            Australia: {
-                pharma: 57.8, deaths: 3946
-            }
-        },
-        {
-            Austria: {
-                pharma: 45.4, deaths: 3011
-            }
-        },
-        {
-            Belgium: {
-                pharma: 60.5, deaths: 1623
-            }
-        },
-        {
-            Canada: {
-                pharma: 75.8, deaths: 6942
-            }
-        },
-        {
-            Chile: {
-                pharma: 61.1, deaths: 3684
-            }
-        },
-        {
-            Colombia: {
-                pharma: 48, deaths: 6859
-            }
-        },
-        {
-            "Costa Rica": {
-                pharma: 0, deaths: 769
-            }
-        }
-        // ...
-    ];
+    d3.csv("chelsea_reformatted.csv").then(function (data) {
+        // Parse the data, convert to number
+        data.forEach(d => {
+            d.value = +d.value;
+            d.year = +d.year;
+        });
 
-    scatterChelsea(dataset, "#chelseaChart")
+        // Get unique years for the dropdown
+        var years = [...new Set(data.map(d => d.year))];
+
+        // Fill dropdown
+        var select = d3.select("#yearSelector");
+        select.selectAll("option")
+            .data(years)
+            .enter()
+            .append("option")
+            .attr("value", d => d)
+            .text(d => d);
+
+        // Initial year to draw scatter
+        var initYear = years[0];
+        updateScatter(initYear);
+
+        // Event listener to update scatter on selected year
+        select.on("change", function () {
+            var selectedYear = +this.value;
+            updateScatter(selectedYear);
+        });
+
+        function updateScatter(selectedYear) {
+            // Filter data based on year
+            var filtered = data.filter(d => d.year === selectedYear);
+
+            // Convert the format
+            var dataset = [];
+
+            filtered.forEach(d => {
+                dataset.push({
+                    country: d.country,
+                    pharma: d.type === "PHARMA" ? d.value : null,
+                    deaths: d.type === "DEATH" ? d.value : null,
+                });
+            });
+
+            // Combine data points of each country into a single object
+            var scatterData = dataset.reduce((acc, curr) => {
+                var item = acc.find(d => d.country === curr.country);
+
+                if (item) {
+                    item.pharma = curr.pharma || item.pharma;
+                    item.deaths = curr.deaths || item.deaths;
+                }
+                else {
+                    acc.push(curr);
+                }
+                return acc;
+            }, []);
+
+            // Clear the previous scatter
+            d3.select("#chelseaChart").html("");
+
+            console.log(dataset);
+            scatterChelsea(dataset, "#chelseaChart");
+        }
+    })
+        .catch(function (error) { // Display error message if any
+            console.log("Error loading data: " + error);
+        });
 
     function scatterChelsea(data, chartId) {
-        
-        const svg = d3.select(chartId)
+
+        var svg = d3.select(chartId)
             .append("svg")
             .attr("width", w)
             .attr("height", h);
 
-        // Extracting the country names and their corresponding data
-        const country = data.map(obj => Object.keys(obj)[0]);
-        const countryData = data.map(obj => Object.values(obj)[0]);
+        // Check for valid data before setting scale domains
+        var maxPharma = d3.max(data, d => (d.pharma !== null) ? d.pharma : 0);
+        var maxDeaths = d3.max(data, d => (d.deaths !== null) ? d.deaths : 0);
 
-        // Extracting pharma and deaths data
-        const pharmaData = countryData.map(country => country.pharma);
-        const deathsData = countryData.map(country => country.deaths);
-
-        const xScale = d3.scaleLinear()
-            .domain([0, d3.max(pharmaData)])
+        var xScale = d3.scaleLinear()
+            .domain([0, maxPharma])
             .range([padding, w - padding]);
 
-        const yScale = d3.scaleLinear()
-            .domain([0, d3.max(deathsData)])
+        var yScale = d3.scaleLinear()
+            .domain([0, maxDeaths])
             .range([h - padding, padding]);
 
-        const xAxis = d3.axisBottom(xScale);
-        const yAxis = d3.axisLeft(yScale);
+        // var xScale = d3.scaleLinear()
+        //     .domain([0, d3.max(data, d => d.pharma)])
+        //     .range([padding, w - padding]);
+
+        // var yScale = d3.scaleLinear()
+        //     .domain([0, d3.max(data, d => d.deaths)])
+        //     .range([h - padding, padding]);
+
+        var xAxis = d3.axisBottom(xScale);
+        var yAxis = d3.axisLeft(yScale);
 
         svg.append("g")
             .attr("transform", `translate(0, ${h - padding})`)
@@ -80,7 +111,7 @@ function init() {
             .call(yAxis);
 
         svg.selectAll("circle")
-            .data(countryData)
+            .data(data)
             .enter()
             .append("circle")
             .attr("cx", d => xScale(d.pharma))
@@ -88,9 +119,24 @@ function init() {
             .attr("r", 5)
             .attr("fill", "steelblue")
             .append("title")
-            .text((d, i) => country[i]);
-    }
+            .text(d => `${d.country}: ${d.pharma} pharma, ${d.deaths} deaths (${d.year})`); // Tooltip
 
+        // X axis label
+        svg.append("text")
+            .attr("class", "x-axis-label")  // Class for styling
+            .attr("x", w / 2)  // Center the label
+            .attr("y", h - padding + 30)  // Position below the axis
+            .attr("text-anchor", "middle")
+            .text("Drugs Consumption in Defined Daily Dosage per 1000 Inhabitants per Day");
+
+        // Y axis label
+        svg.append("text")
+            .attr("class", "y-axis-label")  // Class for styling
+            .attr("x", padding)
+            .attr("y", padding - 10)  // Position to left of the axis
+            .attr("text-anchor", "middle")
+            .text("Number of Deaths");
+    }
 }
 
 window.onload = init;
