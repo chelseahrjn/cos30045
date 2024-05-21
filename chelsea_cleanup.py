@@ -8,7 +8,7 @@ with open('chelsea_data.csv', 'r') as file:
 # Extract the header row
 header = data[0]
 
-# Create a new list to store the reformatted data
+# Create a new list for the reformatted data
 reformatted_data = []
 
 # Iterate over the rows (excluding the header row)
