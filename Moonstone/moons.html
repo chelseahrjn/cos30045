@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <style>
+
+    body{
+        background-color: rgb(190, 202, 229);
+    }
+    #tooltip {
+      position: absolute;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      pointer-events: none;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin: 5px;
+    }
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+    }
+    h1 {
+      color: salmon;
+      text-align: center; /* Center-align text */
+    }
+    #chart-container {
+      display: flex;
+      justify-content: center; /* Center-align the chart horizontally */
+      align-items: center; /* Center-align the chart vertically */
+      height: 100vh; /* Full viewport height */
+    }
+    #chart {
+      position: relative; /* Relative positioning for absolute positioning of legend */
+    }
+    #legend {
+      position: absolute; /* Absolute positioning */
+      top: 0; /* Top-right corner */
+      right: 0;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+
+    .navbar {
+        width: 85%;
+        height: 15%;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+}
+  </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <a href="https://www.swinburne.edu.au/"><img src="../images/logo.png" class="logo"></a>
+        <h1>Usages of Anti-Depressants in Some of the OECD Countries per Thousand</h1>
+        <p></p>
+    </div>
+  
+  <div id="chart-container">
+    <div id="chart">
+      <div id="legend"></div>
+    </div>
+  </div>
+  <div id="tooltip"><div id="value"></div></div>
+  <script src="stackbar.js"></script>
+</body>
+</html>
