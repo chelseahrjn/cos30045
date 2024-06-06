@@ -28,15 +28,39 @@
     margin-bottom: 0;
 }
 
-/* Chelsea */
-.container {
+/* index.html */
+.navbar {
+    margin: auto;
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+}
+
+.logo img {
+    width: 75%;
+}
+
+.index-title {
+    color: salmon;
+    text-align: left;
+}
+
+.index-title h1 {
+    margin: auto 0;
+}
+
+.index-container {
     margin-top: 30px;
 }
 
+/* Chelsea */
 select .form-select {
     width: 30%;
 }
 
 .x-axis-label, .y-axis-label {
     font-size: 11px;
+    font-weight: bold;
 }
