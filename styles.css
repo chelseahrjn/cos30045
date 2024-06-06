@@ -55,6 +55,10 @@
     margin-top: 30px;
 }
 
+.redirect {
+    margin-top: 20px;
+}
+
 /* Chelsea */
 select .form-select {
     width: 30%;
