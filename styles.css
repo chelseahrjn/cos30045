@@ -43,7 +43,7 @@
 }
 
 .index-title {
-    color: salmon;
+    color: #333;
     text-align: left;
 }
 
@@ -67,4 +67,15 @@ select .form-select {
 .x-axis-label, .y-axis-label {
     font-size: 11px;
     font-weight: bold;
+}
+
+.x-axis .tick line,
+.y-axis .tick line {
+    stroke: #d3d3d3;
+    stroke-width: 1;
+}
+
+.x-axis path.domain,
+.y-axis path.domain {
+    stroke: none;
 }
