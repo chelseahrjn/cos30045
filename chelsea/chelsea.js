@@ -13,8 +13,9 @@ function init() {
         // Get unique years for the dropdown
         var years = [...new Set(data.map(d => d.year))];
 
-        // Fill dropdown
         var select = d3.select("#yearSelector");
+        // Populate the dropdown list
+
         select.selectAll("option")
             .data(years)
             .enter()
@@ -44,6 +45,7 @@ function init() {
                     country: d.country,
                     pharma: d.type === "PHARMA" ? d.value : null,
                     deaths: d.type === "DEATH" ? d.value : null,
+                    year: d.year
                 });
             });
 
@@ -61,11 +63,84 @@ function init() {
                 return acc;
             }, []);
 
-            // Clear the previous scatter
-            d3.select("#chelseaChart").html("");
+            console.log(scatterData);
 
-            console.log(dataset);
-            scatterChelsea(dataset, "#chelseaChart");
+
+            // Update scatter plot with transitions
+            var svg = d3.select("#chelseaChart svg");
+            
+            // Check if svg exists
+            if (svg.empty()) {
+                scatterChelsea(dataset, "#chelseaChart");
+            }
+            else {
+                // Update scales of new data
+                var maxPharma = d3.max(scatterData, d => (d.pharma !== null) ? d.pharma : 0);
+                var maxDeaths = d3.max(scatterData, d => (d.deaths !== null) ? d.deaths : 0);
+    
+                var xScale = d3.scaleLinear()
+                    .domain([0, maxPharma])
+                    .range([padding, w - padding]);
+    
+                var yScale = d3.scaleLinear()
+                    .domain([0, maxDeaths])
+                    .range([h - padding, padding]);
+    
+                var xAxis = d3.axisBottom(xScale);
+                var yAxis = d3.axisLeft(yScale);
+    
+                svg.select(".x-axis")
+                    .transition()
+                    .duration(500)
+                    .call(xAxis);
+    
+                svg.select(".y-axis")
+                    .transition()
+                    .duration(500)
+                    .call(yAxis);
+    
+                // Bind the new data
+                var circles = svg.selectAll("circle")
+                    .data(scatterData, d => d.country);
+    
+                // Update the existing circles
+                circles.transition()
+                    .duration(500)
+                    .attr("cx", d => xScale(d.pharma))
+                    .attr("cy", d => yScale(d.deaths))
+                    .attr("r", 5)
+                    .attr("fill", "steelblue")
+                    .style("opacity", 0.8);
+    
+                // Enter the new circles
+                circles.enter()
+                    .append("circle")
+                    .attr("cx", d => xScale(d.pharma))
+                    .attr("cy", d => yScale(d.deaths))
+                    .attr("r", 5)
+                    .attr("fill", "steelblue")
+                    .style("opacity", 0.8)
+                    .on("mouseover", mouseover)
+                    .on("mousemove", mousemove)
+                    .on("mouseleave", mouseleave)
+                    .transition()
+                    .duration(500);
+                
+                // Remove the old circles
+                circles.exit()
+                    .transition()
+                    .duration(500)
+                    .attr("r", 0)
+                    .remove();
+            }
+
+
+            // // ????
+            // // Clear the previous scatter
+            // d3.select("#chelseaChart").html("");
+
+            // console.log(dataset);
+            // scatterChelsea(dataset, "#chelseaChart");
         }
     })
         .catch(function (error) { // Display error message if any
@@ -102,6 +177,37 @@ function init() {
         var xAxis = d3.axisBottom(xScale);
         var yAxis = d3.axisLeft(yScale);
 
+        var tooltip = d3.select(chartId)
+            .append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0)
+            .style("background-color", "#212121")
+            .style("color", "#fff")
+            .style("border-radius", "5px")
+            .style("padding", "7px")
+            .style("position", "absolute")
+            .style("font-size", "10px");
+
+        var mouseover = function (d) {
+            tooltip.style("opacity", 1);
+            d3.select(this)
+                .style("stroke", "#212121")
+                .style("opacity", 1)
+        }
+
+        var mousemove = function (event, d) {
+            tooltip.html(`${d.country} (${d.year}): <br> >> ${d.pharma} DDD per 1000 Inhabitants per Day <br> >> ${d.deaths} deaths per 1000 deaths`)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 28) + "px");
+        }
+
+        var mouseleave = function (d) {
+            tooltip.style("opacity", 0);
+            d3.select(this)
+                .style("stroke", "none")
+                .style("opacity", 0.8);
+        }
+
         svg.append("g")
             .attr("transform", `translate(0, ${h - padding})`)
             .call(xAxis);
@@ -110,16 +216,19 @@ function init() {
             .attr("transform", `translate(${padding}, 0)`)
             .call(yAxis);
 
+        // Add scatter points
         svg.selectAll("circle")
-            .data(data)
+            .data(data.filter(d => d.pharma !== null && d.deaths !== null)) // Filter out null values
             .enter()
             .append("circle")
             .attr("cx", d => xScale(d.pharma))
             .attr("cy", d => yScale(d.deaths))
             .attr("r", 5)
             .attr("fill", "steelblue")
-            .append("title")
-            .text(d => `${d.country}: ${d.pharma} pharma, ${d.deaths} deaths (${d.year})`); // Tooltip
+            .style("opacity", 0.8)
+            .on("mouseover", mouseover)
+            .on("mousemove", mousemove)
+            .on("mouseleave", mouseleave);
 
         // X axis label
         svg.append("text")
@@ -127,7 +236,7 @@ function init() {
             .attr("x", w / 2)  // Center the label
             .attr("y", h - padding + 30)  // Position below the axis
             .attr("text-anchor", "middle")
-            .text("Drugs Consumption in Defined Daily Dosage per 1000 Inhabitants per Day");
+            .text("Drugs Consumption in Defined Daily Dosage (DDD) per 1000 Inhabitants per Day");
 
         // Y axis label
         svg.append("text")
