@@ -47,7 +47,7 @@ function init() {
         function mouseover(event, d) {
             tooltip.style("opacity", 1);
             d3.select(this)
-                .style("stroke", "#212121")
+                .style("stroke", "yellow")
                 .style("opacity", 1);
         }
 
@@ -143,7 +143,9 @@ function init() {
                     .attr("cy", d => yScale(d.deaths))
                     .attr("r", 0)
                     .style("opacity", 0.8)
-                    .attr("fill", "steelblue")
+                    .attr("fill", function (d) {
+                        return "rgb(0, 0, " + Math.round(d.deaths / d.pharma) + ")"
+                    })
                     .on("mouseover", mouseover)
                     .on("mousemove", mousemove)
                     .on("mouseleave", mouseleave)
@@ -210,7 +212,9 @@ function init() {
                 .attr("cx", d => xScale(d.pharma))
                 .attr("cy", d => yScale(d.deaths))
                 .attr("r", 5)
-                .attr("fill", "steelblue")
+                .attr("fill", function (d) {
+                    return "rgb(0, 0, " + Math.round(d.deaths / d.pharma) * 100 + ")"
+                })
                 .style("opacity", 0.8)
                 .on("mouseover", mouseover)
                 .on("mousemove", mousemove)
